@@ -14,6 +14,21 @@ const projects = [
     title: 'Project Name — Bhaktapur',
     desc: 'Structural analysis and complete design for family residence.',
   },
+  {
+    tag: 'Commercial',
+    title: 'Project Name — Pokhara',
+    desc: 'Multi-use commercial building with modern facade and structural design.',
+  },
+  {
+    tag: 'Renovation',
+    title: 'Project Name — Biratnagar',
+    desc: 'Full renovation and structural reinforcement of an existing 2-storey home.',
+  },
+  {
+    tag: 'Interior Design',
+    title: 'Project Name — Chitwan',
+    desc: 'Complete interior design and finishing for a luxury residential property.',
+  },
 ]
 
 export default function Projects() {

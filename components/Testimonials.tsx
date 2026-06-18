@@ -17,6 +17,24 @@ const testimonials = [
     name: 'Bikram Poudel',
     location: 'Bhaktapur',
   },
+  {
+    text: 'From design to handover, everything was handled with great care. The team was always available to answer our questions and the final result exceeded our expectations.',
+    initials: 'AK',
+    name: 'Anita Karki',
+    location: 'Pokhara',
+  },
+  {
+    text: 'We hired Afno Ghar for our commercial project and they delivered outstanding results. Their attention to detail and commitment to deadlines is truly commendable.',
+    initials: 'NR',
+    name: 'Nabin Rai',
+    location: 'Biratnagar',
+  },
+  {
+    text: 'Excellent service from start to finish. The interior design team understood our vision perfectly and transformed our home into something we are truly proud of.',
+    initials: 'PS',
+    name: 'Priya Shrestha',
+    location: 'Chitwan',
+  },
 ]
 
 export default function Testimonials() {
