@@ -1,33 +1,38 @@
 const services = [
   {
-    icon: '🏗️',
-    title: 'Building Design',
-    desc: 'Architectural planning with 2D & 3D house designs. Functional, modern layouts tailored to your lifestyle and budget.',
+    icon: '🏛',
+    title: 'Architectural Design',
+    desc: 'Custom 2D floor plans and 3D visualizations tailored to your lifestyle, plot size, and budget. See your home before a single brick is laid.',
   },
   {
     icon: '📊',
     title: 'Structural Analysis',
-    desc: 'Earthquake-resistant design, load calculations, and structural safety as per NBC / IS codes. Built to last.',
+    desc: 'Earthquake-resistant design with full load calculations per NBC and IS codes. Your building is engineered to protect your family for decades.',
   },
   {
-    icon: '👷',
-    title: 'Construction Services',
-    desc: 'Complete house construction with professional material management and skilled workforce execution from foundation to roof.',
+    icon: '🏗',
+    title: 'Building Construction',
+    desc: 'End-to-end construction with professional material management, certified workforce, and strict quality checks from foundation to finishing.',
   },
   {
     icon: '🔍',
     title: 'Site Supervision',
-    desc: 'Regular site inspections, quality control of materials, and detailed progress tracking and reporting at every phase.',
+    desc: 'Regular on-site inspections, material quality verification, and detailed progress reports — so you always know exactly where your project stands.',
   },
   {
-    icon: '🛋️',
+    icon: '📋',
+    title: 'Municipality Approval',
+    desc: 'We prepare and submit all technical drawings and documents required for building permit approval. Hassle-free, compliant, and fast.',
+  },
+  {
+    icon: '💰',
+    title: 'Cost Estimation',
+    desc: 'Accurate, itemized cost breakdowns before construction starts. No hidden charges. Plan your budget with complete confidence.',
+  },
+  {
+    icon: '🛋',
     title: 'Interior Design',
-    desc: 'Space planning, modern interior concepts, and budget-friendly finishing solutions that make your home feel complete.',
-  },
-  {
-    icon: '📐',
-    title: 'Free Consultation',
-    desc: 'Your first consultation is completely free. We listen to your requirements and guide you with an honest, transparent assessment.',
+    desc: 'Space planning, material selection, and modern finishing concepts that make every room feel exactly the way you imagined it.',
   },
 ]
 
@@ -36,8 +41,11 @@ export default function Services() {
     <section id="services">
       <div className="services-header reveal">
         <span className="section-tag">What We Offer</span>
-        <h2>Our <em>Services</em></h2>
+        <h2>Complete <em>Services</em> Under One Roof</h2>
         <div className="section-divider" />
+        <p className="services-sub">
+          From design to handover — every service you need to build your dream home, delivered by qualified civil engineers.
+        </p>
       </div>
       <div className="services-grid">
         {services.map((s) => (

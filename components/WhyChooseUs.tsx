@@ -1,28 +1,33 @@
 const reasons = [
   {
-    num: '01',
-    title: 'Engineering First Approach',
-    desc: "We don't guess — we calculate, analyze, and build. Every decision is grounded in engineering science.",
+    icon: '🛡',
+    badge: 'Safety',
+    title: 'Safety First, Always',
+    desc: 'Every structure we design is earthquake-resistant and fully NBC-compliant. Your family\'s safety is never negotiated — it is engineered.',
   },
   {
-    num: '02',
-    title: 'Young & Energetic Team',
-    desc: 'Modern thinking combined with updated engineering practices for better, smarter construction solutions.',
+    icon: '📐',
+    badge: 'Precision',
+    title: 'Engineering Precision',
+    desc: 'We calculate, analyze, and verify — no guesswork. Load calculations, structural analysis, and field checks at every stage.',
   },
   {
-    num: '03',
-    title: 'Strict Quality Assurance',
-    desc: 'We supervise every stage — from material selection to final finishing — so nothing slips through.',
+    icon: '💰',
+    badge: 'Transparency',
+    title: 'Transparent Budgeting',
+    desc: 'You receive a detailed cost breakdown before construction begins. No hidden charges, no last-minute surprises — just honest numbers.',
   },
   {
-    num: '04',
-    title: 'Cost Optimization',
-    desc: 'We help you save money without ever compromising on structural integrity or material quality.',
+    icon: '🏗',
+    badge: 'Quality',
+    title: 'Quality Construction',
+    desc: 'Premium materials, certified workers, and strict quality checks at foundation, column, slab, and finishing stages.',
   },
   {
-    num: '05',
-    title: 'Client Transparency',
-    desc: 'Clear communication at every step. No hidden work, no surprises — just honest updates and results.',
+    icon: '📞',
+    badge: 'Support',
+    title: 'Dedicated Project Support',
+    desc: 'A dedicated engineer is assigned to your project. Get real-time updates, progress reports, and answers whenever you need them.',
   },
 ]
 
@@ -31,13 +36,17 @@ export default function WhyChooseUs() {
     <section id="why">
       <div className="why-header reveal">
         <span className="section-tag">Our Advantage</span>
-        <h2>Why Clients <em>Choose Us</em></h2>
+        <h2>Why Homeowners <em>Trust Us</em></h2>
         <div className="section-divider" />
+        <p className="why-sub">
+          Building a home is the biggest investment of your life. Here&apos;s why hundreds of Nepali families choose Afno Ghar.
+        </p>
       </div>
       <div className="why-grid">
         {reasons.map((r) => (
-          <div key={r.num} className="why-item reveal">
-            <div className="why-num">{r.num}</div>
+          <div key={r.badge} className="why-item reveal">
+            <div className="why-icon">{r.icon}</div>
+            <div className="why-badge">{r.badge}</div>
             <h3>{r.title}</h3>
             <p>{r.desc}</p>
           </div>

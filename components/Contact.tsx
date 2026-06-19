@@ -8,21 +8,14 @@ export default function Contact() {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setStatus('sending')
-
-    const form = e.currentTarget
-    const data = new FormData(form)
-
+    const data = new FormData(e.currentTarget)
     try {
       const res = await fetch('https://formspree.io/f/meepklzz', {
         method: 'POST',
         body: data,
         headers: { Accept: 'application/json' },
       })
-      if (res.ok) {
-        setStatus('success')
-      } else {
-        setStatus('error')
-      }
+      setStatus(res.ok ? 'success' : 'error')
     } catch {
       setStatus('error')
     }
@@ -50,7 +43,7 @@ export default function Contact() {
               <div className="contact-icon">📞</div>
               <div>
                 <strong>Phone</strong>
-                <span>+977-9860648569</span>
+                <span><a href="tel:+9779860648569" className="contact-phone-link">+977-9860648569</a></span>
               </div>
             </div>
             <div className="contact-item">
@@ -68,38 +61,30 @@ export default function Contact() {
               </div>
             </div>
           </div>
+          <a
+            href="https://wa.me/9779860648569?text=Hello%2C%20I%20would%20like%20to%20inquire%20about%20your%20construction%20services."
+            className="contact-whatsapp"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            💬 Chat on WhatsApp
+          </a>
         </div>
 
         <div className="contact-form reveal">
           <h3>Request a Free Consultation</h3>
 
           {status === 'success' ? (
-            <div style={{
-              background: 'rgba(82,183,136,0.15)',
-              border: '1px solid rgba(82,183,136,0.4)',
-              borderRadius: 6,
-              padding: '20px 22px',
-              textAlign: 'center',
-            }}>
-              <div style={{ fontSize: '1.6rem', marginBottom: 8 }}>✓</div>
-              <strong style={{ color: 'var(--green-light)', display: 'block', marginBottom: 4 }}>Message Sent!</strong>
-              <span style={{ color: 'rgba(255,255,255,0.65)', fontSize: '0.88rem' }}>
-                We&apos;ll get back to you within 24 hours.
-              </span>
+            <div className="form-success">
+              <div className="form-success-icon">✓</div>
+              <strong>Message Sent!</strong>
+              <span>We&apos;ll get back to you within 24 hours.</span>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
               {status === 'error' && (
-                <div style={{
-                  background: 'rgba(220,80,80,0.12)',
-                  border: '1px solid rgba(220,80,80,0.35)',
-                  borderRadius: 6,
-                  padding: '14px 18px',
-                  marginBottom: 16,
-                }}>
-                  <span style={{ color: '#f08080', fontSize: '0.88rem' }}>
-                    Something went wrong. Please try again or call us directly.
-                  </span>
+                <div className="form-error">
+                  Something went wrong. Please try again or call us directly.
                 </div>
               )}
               <div className="form-group">
@@ -113,10 +98,12 @@ export default function Contact() {
               <div className="form-group">
                 <label htmlFor="service">Service Needed</label>
                 <select id="service" name="service">
-                  <option>Building Design</option>
+                  <option>Architectural Design</option>
                   <option>Structural Analysis</option>
-                  <option>Construction Services</option>
+                  <option>Building Construction</option>
                   <option>Site Supervision</option>
+                  <option>Municipality Approval</option>
+                  <option>Cost Estimation</option>
                   <option>Interior Design</option>
                   <option>Full Project (Design + Build)</option>
                 </select>
@@ -129,13 +116,8 @@ export default function Contact() {
                   placeholder="Tell us about your project — location, size, budget..."
                 />
               </div>
-              {/* Honeypot spam trap */}
-              <input type="text" name="_gotcha" style={{ display: 'none' }} />
-              <button
-                type="submit"
-                className="form-submit"
-                disabled={status === 'sending'}
-              >
+              <input type="text" name="_gotcha" className="honeypot" aria-hidden="true" title="Do not fill this field" tabIndex={-1} />
+              <button type="submit" className="form-submit" disabled={status === 'sending'}>
                 {status === 'sending' ? 'Sending…' : 'Send Message →'}
               </button>
             </form>
