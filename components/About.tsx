@@ -1,47 +1,94 @@
-import Image from 'next/image'
+'use client'
+
+import { useState } from 'react'
+import { T, useText, EditChip } from './ContentProvider'
+import { useAdmin } from './AdminProvider'
+import { useCollection, ItemModal, AddInline } from './CollectionAdmin'
+import { CollectionItem } from '@/lib/collections'
+
+const DEFAULT_IMG =
+  'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80'
 
 export default function About() {
+  const { isAdmin } = useAdmin()
+  const img = useText('about.img', DEFAULT_IMG)
+  const trust = useCollection('about_trust')
+  const [editing, setEditing] = useState<CollectionItem | null>(null)
+
   return (
     <section id="about">
       <div className="about-grid">
         <div className="about-img-wrap reveal">
           <div className="about-img-frame">
-            <Image
-              src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&q=80"
-              alt="Civil engineering team reviewing construction plans"
-              fill
-              sizes="(max-width: 768px) 100vw, 45vw"
-              style={{ objectFit: 'cover', objectPosition: 'center' }}
-              priority
-            />
+            <img src={img} alt="Civil engineering team reviewing construction plans" />
+            {isAdmin && (
+              <div className="adm-card-actions">
+                <EditChip k="about.img" d={DEFAULT_IMG} label="Image URL" />
+              </div>
+            )}
           </div>
           <div className="about-badge">
-            <strong>5+</strong>
-            <small>Years of<br />Experience</small>
+            <strong><T k="about.badge_num" d="5+" /></strong>
+            <small><T k="about.badge_label" d="Years of Experience" /></small>
           </div>
         </div>
 
         <div className="reveal">
-          <span className="section-tag">Who We Are</span>
+          <span className="section-tag">
+            <T k="about.tag" d="Who We Are" />
+          </span>
           <h2>
-            A Team of Passionate<br />
-            <em>Civil Engineers</em>
+            <T k="about.title" d="A Team of Passionate" /><br />
+            <em><T k="about.title_accent" d="Civil Engineers" /></em>
           </h2>
           <div className="section-divider" />
           <p className="about-body-text">
-            At Afno Ghar Consulting &amp; Construction, we are committed to delivering safe, economical, and modern residential buildings. With hands-on experience in design, supervision, and construction, every project is executed with engineering accuracy and practical field knowledge.
+            <T
+              k="about.body"
+              d="At Afno Ghar Consulting & Construction, we are committed to delivering safe, economical, and modern residential buildings. With hands-on experience in design, supervision, and construction, every project is executed with engineering accuracy and practical field knowledge."
+              multiline
+            />
           </p>
           <div className="about-philosophy">
-            &ldquo;We don&apos;t just build houses — we build safe homes where families grow.&rdquo;
+            &ldquo;<T
+              k="about.quote"
+              d="We don't just build houses — we build safe homes where families grow."
+              multiline
+            />&rdquo;
           </div>
           <ul className="trust-list">
-            <li>Engineering-based approach, not just contractors</li>
-            <li>Transparency in work and communication at every stage</li>
-            <li>Focus on safety, durability, and cost-efficiency</li>
-            <li>On-site supervision and rigorous quality control</li>
+            {trust.items.map((item, i) => (
+              <li key={item.id ?? i}>
+                {item.data.label}
+                {isAdmin && item.id && (
+                  <span className="adm-inline-chips">
+                    <button type="button" className="adm-mini" onClick={() => setEditing(item)} disabled={trust.busy}>✎</button>
+                    <button
+                      type="button"
+                      className="adm-mini adm-mini-danger"
+                      disabled={trust.busy}
+                      onClick={() => {
+                        if (window.confirm('Delete this checklist item?')) trust.remove(item)
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </span>
+                )}
+              </li>
+            ))}
           </ul>
+          {isAdmin && <AddInline label="Add checklist item" onClick={() => setEditing({ data: {} })} />}
         </div>
       </div>
+      {editing && (
+        <ItemModal
+          collection="about_trust"
+          item={editing}
+          onClose={() => setEditing(null)}
+          onSave={trust.save}
+        />
+      )}
     </section>
   )
 }

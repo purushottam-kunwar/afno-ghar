@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { T } from './ContentProvider'
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false)
@@ -18,8 +19,8 @@ export default function Nav() {
     <>
       <nav className={scrolled ? 'scrolled' : ''}>
         <a href="#hero" className="nav-logo">
-          Afno Ghar
-          <span>Consulting &amp; Construction</span>
+          <T k="brand.name" d="Afno Ghar" />
+          <span><T k="brand.tagline" d="Consulting & Construction" /></span>
         </a>
         <ul className="nav-links">
           <li><a href="#about">About</a></li>
@@ -28,7 +29,7 @@ export default function Nav() {
           <li><a href="#projects">Projects</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
-        <a href="#contact" className="nav-cta">Free Consultation</a>
+        <a href="#contact" className="nav-cta"><T k="nav.cta" d="Free Consultation" /></a>
         <button className="hamburger" onClick={() => setMenuOpen(true)} aria-label="Open menu">
           <span /><span /><span />
         </button>

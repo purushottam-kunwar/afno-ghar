@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { Outfit, Inter } from 'next/font/google'
+import AdminProvider from '@/components/AdminProvider'
+import ContentProvider from '@/components/ContentProvider'
 import './globals.css'
 
 const outfit = Outfit({
@@ -23,7 +25,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${outfit.variable} ${inter.variable}`}>
-      <body>{children}</body>
+      <body>
+        <AdminProvider>
+          <ContentProvider>{children}</ContentProvider>
+        </AdminProvider>
+      </body>
     </html>
   )
 }

@@ -1,0 +1,83 @@
+# Admin Mode — Setup Guide
+
+The site supports a full admin mode: log in at `/admin`, and the homepage
+becomes editable in place —
+
+- **Every text** (headings, paragraphs, buttons, contact info) gets a dashed
+  outline in admin mode; click it, edit, **Update website** — live instantly.
+- **Every list** (hero stats, counters, trust badges, why-cards, services,
+  process steps, about checklist, projects, reviews) gets ✎ / ✕ buttons per
+  item and an **+ Add** control.
+- **Images** (about photo, project photos) are edited by URL via the ✎ chips.
+- Contact details (phone, WhatsApp, email) are stored once and update
+  everywhere they appear (contact section, footer, floating buttons, CTA).
+
+Changes save to Supabase and are live for every visitor immediately — no
+rebuild or redeploy. Content lives in four tables: `projects`,
+`testimonials`, `site_content` (one row per text, created when you first
+edit it), and `collection_items` (all repeating lists).
+
+> **Upgrading from v1?** Run `supabase/schema-v2.sql` in the SQL Editor once.
+
+Until Supabase is configured, the site behaves exactly as before (it renders
+the built-in content and `/admin` shows a "not configured" notice).
+
+## 1. Create the Supabase project (free)
+
+1. Go to [supabase.com](https://supabase.com) → New project.
+2. Pick any name (e.g. `afno-ghar`) and a strong database password.
+
+## 2. Create the tables
+
+1. In the Supabase dashboard, open **SQL Editor**.
+2. Paste the entire contents of [`supabase/schema.sql`](supabase/schema.sql) and click **Run**.
+3. Then paste the entire contents of [`supabase/schema-v2.sql`](supabase/schema-v2.sql) and click **Run**.
+
+This creates all four content tables, seeds them with the current site
+content, and sets the security rules: anyone can read, only a signed-in
+user can write.
+
+## 3. Create your admin account
+
+1. Dashboard → **Authentication → Users → Add user → Create new user**.
+2. Enter your email and a strong password. Check **Auto Confirm User**.
+
+That's the account you'll use at `/admin`. Don't share it — anyone signed
+in can edit the site.
+
+## 4. Connect the website
+
+Local development:
+
+```bash
+cp .env.local.example .env.local
+# then edit .env.local with the values from
+# Supabase Dashboard → Project Settings → API:
+#   Project URL  → NEXT_PUBLIC_SUPABASE_URL
+#   anon public  → NEXT_PUBLIC_SUPABASE_ANON_KEY
+npm run dev
+```
+
+Netlify (production): Site settings → **Environment variables** → add the
+same two variables, then trigger a redeploy so they're baked into the build.
+
+## 5. Use it
+
+- Visit `/admin` and sign in → you're redirected to the homepage.
+- A pill at the bottom shows you're in admin mode; each project/review card
+  gets **✎ Edit** and **✕** buttons, and a dashed **+ Add** card appears at
+  the end of each grid.
+- **Update website** publishes instantly. **Log out** from the pill when done.
+
+## How it works / limits
+
+- The site is still a fully static export — there is no server. The browser
+  fetches projects and reviews from Supabase on page load and, when you're
+  logged in, writes to it directly. Security is enforced by Supabase
+  row-level security, not by the site.
+- The anon key in the build is public by design; it only allows what the
+  RLS policies permit (read for everyone, write for authenticated users).
+- Images are added by URL. For your own photos, upload to Supabase Storage
+  (dashboard → Storage → create a public bucket) and paste the public URL.
+- If Supabase is unreachable, the site silently falls back to the built-in
+  content, so the public site never breaks.

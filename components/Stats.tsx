@@ -1,13 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-
-const stats = [
-  { end: 40, suffix: '+', label: 'Homes Completed', desc: 'Residential buildings across Nepal' },
-  { end: 100, suffix: '+', label: 'Structural Designs', desc: 'NBC-compliant engineering drawings' },
-  { end: 1000, suffix: '+', label: 'Site Inspections', desc: 'Quality control visits conducted' },
-  { end: 100, suffix: '%', label: 'NBC Compliance', desc: 'Every project meets national standards' },
-]
+import { useAdmin } from './AdminProvider'
+import { useCollection, ItemChips, ItemModal, AddCard } from './CollectionAdmin'
+import { CollectionItem } from '@/lib/collections'
 
 function Counter({ end, suffix }: { end: number; suffix: string }) {
   const [count, setCount] = useState(0)
@@ -46,17 +42,38 @@ function Counter({ end, suffix }: { end: number; suffix: string }) {
 }
 
 export default function Stats() {
+  const { isAdmin } = useAdmin()
+  const counters = useCollection('counters')
+  const [editing, setEditing] = useState<CollectionItem | null>(null)
+
   return (
     <section id="stats">
       <div className="stats-inner">
-        {stats.map((s) => (
-          <div key={s.label} className="stat-counter-card reveal">
-            <Counter end={s.end} suffix={s.suffix} />
-            <div className="counter-label">{s.label}</div>
-            <div className="counter-desc">{s.desc}</div>
+        {counters.items.map((item, i) => (
+          <div key={item.id ?? i} className="stat-counter-card">
+            {isAdmin && item.id && (
+              <ItemChips
+                onEdit={() => setEditing(item)}
+                onDelete={() => counters.remove(item)}
+                deleteLabel={`the "${item.data.label}" counter`}
+                disabled={counters.busy}
+              />
+            )}
+            <Counter end={parseInt(item.data.end, 10) || 0} suffix={item.data.suffix ?? ''} />
+            <div className="counter-label">{item.data.label}</div>
+            <div className="counter-desc">{item.data.desc}</div>
           </div>
         ))}
+        {isAdmin && <AddCard label="Add Counter" onClick={() => setEditing({ data: {} })} />}
       </div>
+      {editing && (
+        <ItemModal
+          collection="counters"
+          item={editing}
+          onClose={() => setEditing(null)}
+          onSave={counters.save}
+        />
+      )}
     </section>
   )
 }

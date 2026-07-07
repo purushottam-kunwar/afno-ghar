@@ -1,84 +1,110 @@
-import Image from 'next/image'
+'use client'
 
-const projects = [
-  {
-    tag: 'Residential',
-    title: '3-Storey Family Home — Kathmandu',
-    desc: 'Earthquake-resistant RCC structure with modern facade. Full design, approval, and supervised construction.',
-    img: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
-    area: '2,400 sq.ft',
-    storeys: '3 Storeys',
-    status: 'Completed',
-  },
-  {
-    tag: 'Design + Build',
-    title: 'Modern Residence — Lalitpur',
-    desc: 'Contemporary 2-storey home with open-plan living spaces and structural design per NBC standards.',
-    img: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80',
-    area: '1,800 sq.ft',
-    storeys: '2 Storeys',
-    status: 'Completed',
-  },
-  {
-    tag: 'Structural Design',
-    title: 'Family Residence — Bhaktapur',
-    desc: 'Full structural analysis and NBC-compliant drawings for a 4-storey family residence. Municipality approved.',
-    img: 'https://images.unsplash.com/photo-1592595896616-c37162298647?w=800&q=80',
-    area: '3,100 sq.ft',
-    storeys: '4 Storeys',
-    status: 'Completed',
-  },
-  {
-    tag: 'Commercial',
-    title: 'Mixed-Use Building — Pokhara',
-    desc: 'Ground-floor commercial units with residential floors above. Structural design, supervision, and handover.',
-    img: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80',
-    area: '4,200 sq.ft',
-    storeys: '5 Storeys',
-    status: 'Completed',
-  },
-  {
-    tag: 'Renovation',
-    title: 'Structural Reinforcement — Biratnagar',
-    desc: 'Full structural assessment and reinforcement of an existing 2-storey home. Seismic retrofitting completed.',
-    img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
-    area: '1,600 sq.ft',
-    storeys: '2 Storeys',
-    status: 'Completed',
-  },
-  {
-    tag: 'Interior Design',
-    title: 'Luxury Interior — Chitwan',
-    desc: 'Complete interior design, space planning, and premium finishing for a newly constructed residence.',
-    img: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80',
-    area: '2,200 sq.ft',
-    storeys: '2 Storeys',
-    status: 'Completed',
-  },
-]
+import { useCallback, useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
+import { Project, fallbackProjects } from '@/lib/content'
+import { useAdmin } from './AdminProvider'
+import { T } from './ContentProvider'
+
+const emptyProject: Project = {
+  tag: '',
+  title: '',
+  description: '',
+  img: '',
+  area: '',
+  storeys: '',
+  status: 'Completed',
+}
 
 export default function Projects() {
+  const { isAdmin } = useAdmin()
+  const [projects, setProjects] = useState<Project[]>(fallbackProjects)
+  const [editing, setEditing] = useState<Project | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+
+  const load = useCallback(async () => {
+    if (!supabase) return
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true })
+    if (!error && data) setProjects(data)
+  }, [])
+
+  useEffect(() => {
+    load()
+  }, [load])
+
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!supabase || !editing) return
+    setSaving(true)
+    setError('')
+    const { id, ...fields } = editing
+    const result = id
+      ? await supabase.from('projects').update(fields).eq('id', id)
+      : await supabase
+          .from('projects')
+          .insert({ ...fields, sort_order: projects.length + 1 })
+    setSaving(false)
+    if (result.error) {
+      setError(result.error.message)
+      return
+    }
+    setEditing(null)
+    await load()
+  }
+
+  const remove = async (p: Project) => {
+    if (!supabase || !p.id) return
+    if (!window.confirm(`Delete "${p.title}"? This removes it from the live site.`)) return
+    setBusy(true)
+    try {
+      await supabase.from('projects').delete().eq('id', p.id)
+      await load()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const field = (key: keyof Project) => ({
+    value: (editing?.[key] as string) ?? '',
+    onChange: (
+      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => setEditing((prev) => prev && { ...prev, [key]: e.target.value }),
+  })
+
   return (
     <section id="projects">
       <div className="projects-header reveal">
-        <span className="section-tag">Our Portfolio</span>
-        <h2>Recent <em>Projects</em></h2>
+        <span className="section-tag"><T k="projects.tag" d="Our Portfolio" /></span>
+        <h2>
+          <T k="projects.title" d="Recent" /> <em><T k="projects.title_accent" d="Projects" /></em>
+        </h2>
         <div className="section-divider" />
         <p className="projects-sub">
-          Explore our completed residential and commercial projects — each reflecting our commitment to quality, design, and structural safety.
+          <T
+            k="projects.sub"
+            d="Explore our completed residential and commercial projects — each reflecting our commitment to quality, design, and structural safety."
+            multiline
+          />
         </p>
       </div>
       <div className="projects-grid">
         {projects.map((p) => (
-          <div key={p.title} className="project-card reveal">
+          <div key={p.id ?? p.title} className="project-card">
+            {isAdmin && (
+              <div className="adm-card-actions">
+                <button type="button" className="adm-chip" onClick={() => setEditing(p)} disabled={busy}>✎ Edit</button>
+                <button type="button" className="adm-chip adm-chip-danger" onClick={() => remove(p)} disabled={busy}>✕</button>
+              </div>
+            )}
             <div className="project-img-wrap">
-              <Image
-                src={p.img}
-                alt={p.title}
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                style={{ objectFit: 'cover' }}
-              />
+              {/* Plain img: admins can use image URLs from any host */}
+              <img src={p.img} alt={p.title} loading="lazy" />
               <div className="project-overlay">
                 <span className="project-overlay-cta">View Project →</span>
               </div>
@@ -86,16 +112,78 @@ export default function Projects() {
             <div className="project-info">
               <div className="project-tag">{p.tag}</div>
               <h3>{p.title}</h3>
-              <p>{p.desc}</p>
+              <p>{p.description}</p>
               <div className="project-meta">
-                <span className="project-meta-item"><strong>{p.area}</strong> Built-up</span>
-                <span className="project-meta-item"><strong>{p.storeys}</strong></span>
-                <span className="project-meta-item"><strong>{p.status}</strong></span>
+                <span className="project-meta-item">
+                  <strong>{p.area}</strong> Built-up
+                </span>
+                <span className="project-meta-item">
+                  <strong>{p.storeys}</strong>
+                </span>
+                <span className="project-meta-item">
+                  <strong>{p.status}</strong>
+                </span>
               </div>
             </div>
           </div>
         ))}
+        {isAdmin && (
+          <button type="button" className="adm-add-card" onClick={() => setEditing({ ...emptyProject })}>
+            <span className="adm-add-plus">+</span>
+            Add Project
+          </button>
+        )}
       </div>
+
+      {isAdmin && editing && (
+        <div className="adm-modal-overlay" onClick={() => !saving && setEditing(null)}>
+          <form
+            className="adm-modal"
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={save}
+          >
+            <h3>{editing.id ? 'Edit Project' : 'Add Project'}</h3>
+            <fieldset disabled={saving}>
+            <label className="adm-label">Category tag</label>
+            <input className="adm-input" placeholder="Residential" required {...field('tag')} />
+            <label className="adm-label">Title</label>
+            <input className="adm-input" placeholder="3-Storey Family Home — Kathmandu" required {...field('title')} />
+            <label className="adm-label">Description</label>
+            <textarea className="adm-input" rows={3} required {...field('description')} />
+            <label className="adm-label">Image URL</label>
+            <input className="adm-input" type="url" placeholder="https://…" required {...field('img')} />
+            <div className="adm-row">
+              <div>
+                <label className="adm-label">Built-up area</label>
+                <input className="adm-input" placeholder="2,400 sq.ft" {...field('area')} />
+              </div>
+              <div>
+                <label className="adm-label">Storeys</label>
+                <input className="adm-input" placeholder="3 Storeys" {...field('storeys')} />
+              </div>
+              <div>
+                <label className="adm-label">Status</label>
+                <input className="adm-input" placeholder="Completed" {...field('status')} />
+              </div>
+            </div>
+            </fieldset>
+            {error && <div className="adm-error">{error}</div>}
+            <div className="adm-modal-actions">
+              <button
+                type="button"
+                className="adm-btn-ghost"
+                onClick={() => setEditing(null)}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="adm-btn-primary" disabled={saving}>
+                {saving ? 'Saving…' : 'Update website'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </section>
   )
 }

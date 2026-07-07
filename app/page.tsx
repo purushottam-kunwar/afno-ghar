@@ -12,6 +12,7 @@ import Contact from '@/components/Contact'
 import Footer from '@/components/Footer'
 import FloatingButtons from '@/components/FloatingButtons'
 import ScrollRevealInit from '@/components/ScrollRevealInit'
+import AdminBar from '@/components/AdminBar'
 
 export default function Home() {
   return (
@@ -32,6 +33,7 @@ export default function Home() {
       </main>
       <Footer />
       <FloatingButtons />
+      <AdminBar />
     </>
   )
 }

@@ -1,9 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useText } from './ContentProvider'
 
 export default function FloatingButtons() {
   const [visible, setVisible] = useState(false)
+  const phone = useText('contact.phone', '+977-9860648569')
+  const whatsapp = useText('contact.whatsapp', '9779860648569')
+  const tel = `tel:${phone.replace(/[^+\d]/g, '')}`
+  const wa = `https://wa.me/${whatsapp}?text=Hello%2C%20I%20would%20like%20to%20inquire%20about%20your%20construction%20services.`
 
   useEffect(() => {
     const onScroll = () => setVisible(window.scrollY > 300)
@@ -17,7 +22,7 @@ export default function FloatingButtons() {
     <>
       <div className="floating-btns">
         <a
-          href="https://wa.me/9779860648569?text=Hello%2C%20I%20would%20like%20to%20inquire%20about%20your%20construction%20services."
+          href={wa}
           className="float-btn float-btn-wa"
           target="_blank"
           rel="noopener noreferrer"
@@ -27,7 +32,7 @@ export default function FloatingButtons() {
           💬
         </a>
         <a
-          href="tel:+9779860648569"
+          href={tel}
           className="float-btn float-btn-call"
           aria-label="Call us now"
         >
@@ -37,11 +42,11 @@ export default function FloatingButtons() {
       </div>
 
       <div className="sticky-mobile-cta">
-        <a href="tel:+9779860648569" className="sticky-cta-call">
+        <a href={tel} className="sticky-cta-call">
           📞 Call Engineer
         </a>
         <a
-          href="https://wa.me/9779860648569?text=Hello%2C%20I%20would%20like%20to%20inquire%20about%20your%20construction%20services."
+          href={wa}
           className="sticky-cta-wa"
           target="_blank"
           rel="noopener noreferrer"
