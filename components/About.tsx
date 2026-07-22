@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { T, useText, EditChip } from './ContentProvider'
+import { T, useText } from './ContentProvider'
 import { useAdmin } from './AdminProvider'
 import { useCollection, ItemModal, AddInline } from './CollectionAdmin'
+import { ImageEditModal, IMAGE_SPECS } from './ImageUpload'
 import { CollectionItem } from '@/lib/collections'
 
 const DEFAULT_IMG =
@@ -14,6 +15,7 @@ export default function About() {
   const img = useText('about.img', DEFAULT_IMG)
   const trust = useCollection('about_trust')
   const [editing, setEditing] = useState<CollectionItem | null>(null)
+  const [editingImg, setEditingImg] = useState(false)
 
   return (
     <section id="about">
@@ -23,7 +25,9 @@ export default function About() {
             <img src={img} alt="Civil engineering team reviewing construction plans" />
             {isAdmin && (
               <div className="adm-card-actions">
-                <EditChip k="about.img" d={DEFAULT_IMG} label="Image URL" />
+                <button type="button" className="adm-chip" onClick={() => setEditingImg(true)}>
+                  ✎ Image
+                </button>
               </div>
             )}
           </div>
@@ -87,6 +91,16 @@ export default function About() {
           item={editing}
           onClose={() => setEditing(null)}
           onSave={trust.save}
+        />
+      )}
+      {editingImg && (
+        <ImageEditModal
+          k="about.img"
+          current={img}
+          spec={IMAGE_SPECS.about}
+          folder="about"
+          title="About Photo"
+          onClose={() => setEditingImg(false)}
         />
       )}
     </section>

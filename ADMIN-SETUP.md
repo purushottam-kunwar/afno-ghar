@@ -8,7 +8,12 @@ becomes editable in place —
 - **Every list** (hero stats, counters, trust badges, why-cards, services,
   process steps, about checklist, projects, reviews) gets ✎ / ✕ buttons per
   item and an **+ Add** control.
-- **Images** (about photo, project photos) are edited by URL via the ✎ chips.
+- **Images** (about photo, project photos) are **uploaded from your computer**
+  via the ✎ chips / project form. Uploads are validated before they're accepted:
+  JPG/PNG/WebP only, max 5 MB, and the right resolution for the slot —
+  project images: landscape (16:10), at least 800×500 px;
+  about photo: portrait (4:5), at least 600×750 px.
+  Files are stored in the public `site-images` Supabase Storage bucket.
 - Contact details (phone, WhatsApp, email) are stored once and update
   everywhere they appear (contact section, footer, floating buttons, CTA).
 
@@ -32,6 +37,8 @@ the built-in content and `/admin` shows a "not configured" notice).
 1. In the Supabase dashboard, open **SQL Editor**.
 2. Paste the entire contents of [`supabase/schema.sql`](supabase/schema.sql) and click **Run**.
 3. Then paste the entire contents of [`supabase/schema-v2.sql`](supabase/schema-v2.sql) and click **Run**.
+4. Then paste the entire contents of [`supabase/schema-v3.sql`](supabase/schema-v3.sql) and click **Run**
+   (creates the `site-images` storage bucket for photo uploads).
 
 This creates all four content tables, seeds them with the current site
 content, and sets the security rules: anyone can read, only a signed-in

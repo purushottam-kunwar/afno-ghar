@@ -13,11 +13,14 @@ interface EditTarget {
 interface ContentContextValue {
   get: (key: string) => string | undefined
   edit: (target: EditTarget) => void
+  /** Programmatic save (upsert). Returns an error message or null. */
+  set: (key: string, value: string) => Promise<string | null>
 }
 
 const ContentContext = createContext<ContentContextValue>({
   get: () => undefined,
   edit: () => {},
+  set: async () => 'Content provider not mounted',
 })
 
 export const useContent = () => useContext(ContentContext)
@@ -47,24 +50,31 @@ export default function ContentProvider({ children }: { children: React.ReactNod
     setError('')
   }
 
-  const save = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!supabase || !editing) return
-    setSaving(true)
+  const set = async (key: string, value: string): Promise<string | null> => {
+    if (!supabase) return 'Supabase not configured'
     const { error } = await supabase
       .from('site_content')
-      .upsert({ key: editing.key, value: draft, updated_at: new Date().toISOString() })
+      .upsert({ key, value, updated_at: new Date().toISOString() })
+    if (error) return error.message
+    setContent((prev) => ({ ...prev, [key]: value }))
+    return null
+  }
+
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editing) return
+    setSaving(true)
+    const err = await set(editing.key, draft)
     setSaving(false)
-    if (error) {
-      setError(error.message)
+    if (err) {
+      setError(err)
       return
     }
-    setContent((prev) => ({ ...prev, [editing.key]: draft }))
     setEditing(null)
   }
 
   return (
-    <ContentContext.Provider value={{ get: (k) => content[k], edit }}>
+    <ContentContext.Provider value={{ get: (k) => content[k], edit, set }}>
       {children}
       {editing && (
         <div className="adm-modal-overlay" onClick={() => !saving && setEditing(null)}>

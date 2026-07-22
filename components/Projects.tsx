@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { Project, fallbackProjects } from '@/lib/content'
 import { useAdmin } from './AdminProvider'
 import { T } from './ContentProvider'
+import { ImageUploadField, IMAGE_SPECS } from './ImageUpload'
 
 const emptyProject: Project = {
   tag: '',
@@ -22,6 +23,7 @@ export default function Projects() {
   const [editing, setEditing] = useState<Project | null>(null)
   const [saving, setSaving] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [uploadingImg, setUploadingImg] = useState(false)
   const [error, setError] = useState('')
 
   const load = useCallback(async () => {
@@ -41,6 +43,10 @@ export default function Projects() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!supabase || !editing) return
+    if (!editing.img) {
+      setError('Please upload an image for this project.')
+      return
+    }
     setSaving(true)
     setError('')
     const { id, ...fields } = editing
@@ -136,7 +142,7 @@ export default function Projects() {
       </div>
 
       {isAdmin && editing && (
-        <div className="adm-modal-overlay" onClick={() => !saving && setEditing(null)}>
+        <div className="adm-modal-overlay" onClick={() => !saving && !uploadingImg && setEditing(null)}>
           <form
             className="adm-modal"
             onClick={(e) => e.stopPropagation()}
@@ -150,8 +156,14 @@ export default function Projects() {
             <input className="adm-input" placeholder="3-Storey Family Home — Kathmandu" required {...field('title')} />
             <label className="adm-label">Description</label>
             <textarea className="adm-input" rows={3} required {...field('description')} />
-            <label className="adm-label">Image URL</label>
-            <input className="adm-input" type="url" placeholder="https://…" required {...field('img')} />
+            <label className="adm-label">Image</label>
+            <ImageUploadField
+              value={editing.img}
+              onChange={(url) => setEditing((prev) => prev && { ...prev, img: url })}
+              spec={IMAGE_SPECS.project}
+              folder="projects"
+              onUploadingChange={setUploadingImg}
+            />
             <div className="adm-row">
               <div>
                 <label className="adm-label">Built-up area</label>
@@ -173,11 +185,11 @@ export default function Projects() {
                 type="button"
                 className="adm-btn-ghost"
                 onClick={() => setEditing(null)}
-                disabled={saving}
+                disabled={saving || uploadingImg}
               >
                 Cancel
               </button>
-              <button type="submit" className="adm-btn-primary" disabled={saving}>
+              <button type="submit" className="adm-btn-primary" disabled={saving || uploadingImg}>
                 {saving ? 'Saving…' : 'Update website'}
               </button>
             </div>

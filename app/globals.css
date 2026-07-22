@@ -1733,6 +1733,25 @@ footer {
   margin: 0;
   min-width: 0;
 }
+
+/* Image upload field */
+.adm-upload { margin-bottom: 4px; }
+.adm-upload-preview {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--cream-dark);
+  margin-bottom: 10px;
+  background: var(--cream);
+}
+.adm-upload-hint {
+  font-size: 0.72rem;
+  color: var(--text-light);
+  margin-top: 6px;
+  line-height: 1.5;
+}
 .adm-modal fieldset:disabled .adm-input { opacity: 0.6; }
 
 .adm-add-card {
