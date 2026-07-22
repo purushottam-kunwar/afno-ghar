@@ -1,5 +1,31 @@
 # Admin Mode — Setup Guide
 
+## Dev / Prod databases
+
+The site uses two separate Supabase projects, routed by Next.js env files:
+
+| File | Database | Used by |
+| --- | --- | --- |
+| `.env.development` | **dev** | `npm run dev` (local editing/testing) |
+| `.env.production` | **prod** | `npm run build` + Netlify deploys |
+
+Both files are committed — publishable keys are safe in git because RLS
+policies enforce all security. `.env.local` stays git-ignored and must NOT
+contain `NEXT_PUBLIC_SUPABASE_*` values (it would override both files).
+
+**Setting up the prod project (one time):**
+
+1. Create a second Supabase project (this is prod; the existing one is dev).
+2. In its SQL Editor run, in order: `schema.sql`, `schema-v2.sql`,
+   `schema-v3.sql`, then `prod-data.sql` (a snapshot of the dev content —
+   regenerate it any time you want to promote dev content to prod).
+3. Authentication → Users → Add user (email + password, **Auto Confirm ON**).
+4. Put the prod URL + publishable key into `.env.production`.
+
+Note: images uploaded in dev are stored in the dev project's storage bucket;
+their URLs keep working in prod, but images uploaded *while on the prod site*
+go to the prod bucket. That is the correct long-term behavior.
+
 The site supports a full admin mode: log in at `/admin`, and the homepage
 becomes editable in place —
 
